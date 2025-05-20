@@ -20,12 +20,27 @@ const Command commands[] = {
 };
 
 bool isValidCommand(const char *arg){}
-const char *process_command(const char *arg);
-void print_prompt(void);
-void read_input(char *input, size_t size);
+const char *processCommand(const char *arg);
+void printPrompt(void);
+void readInput(char *input, size_t size);
 
 
-int main(int argc, char  *argv[]) {}
+int main(int argc, char  *argv[]) {
+  setbuf(stdout,NULL);
+  char  input[MAX_INPUT_LEN];
+  while (1) {
+    printPrompt();
+    readInput(input, sizeof(input));
+
+    if (strcmp(input, "exit")==0) {
+      return EXIT_SUCCESS;
+    }
+    const char *output = process_command(input);
+    if (output) {
+      printf("%s\n", output);
+    }
+  }
+}
 
 bool isValidCommand(const char *arg) {
   for (int i = 0; i < COMMAND_COUNT; i++) {
@@ -36,11 +51,17 @@ bool isValidCommand(const char *arg) {
   return false;  
 }
 
-const char *process_command(const char *arg) {}
-
-void print_prompt(void) {
+const char *processCommand(const char *arg) {
+  
+}
+void printPrompt(void) {
   printf("$ ");
 }
 
-void read_input(char *input, size_t size) {}
-
+void readInput(char *input, size_t size) {
+  if (fgets(input, size, stdin)==NULL) {
+    strcpy(input, "exit");
+    return;
+  }
+  input[strcspn(input, "\n")] = 0; 
+}
