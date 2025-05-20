@@ -1,23 +1,8 @@
-# Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+CFLAGS = -Wall -Wextra -std=c99 -Iinclude
+SRC = src/main.c src/commands/cmdProcess.c
+OUT = shell
 
-# Paths and files
-SRC_DIR = src
-SRC = $(SRC_DIR)/main.c
-TARGET = shell
-
-# Default target
-all: $(TARGET)
-
-# Build the executable
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Remove the executable
-clean:
-	rm -f $(TARGET)
-
-# Convenience
-.PHONY: all clean
+all:
+	$(CC) $(CFLAGS) $(SRC) -o $(OUT)
 
