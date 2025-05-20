@@ -19,7 +19,7 @@ const Command commands[] = {
     {"type", "returns brief description of a command", "builtin"}
 };
 
-bool isValidCommand(const char *arg){}
+//bool isValidCommand(const char *arg){}
 const char *processCommand(const char *arg);
 void printPrompt(void);
 void readInput(char *input, size_t size);
@@ -35,13 +35,13 @@ int main(int argc, char  *argv[]) {
     if (strcmp(input, "exit")==0) {
       return EXIT_SUCCESS;
     }
-    const char *output = process_command(input);
+    const char *output = processCommand(input);
     if (output) {
       printf("%s\n", output);
     }
   }
 }
-
+/*
 bool isValidCommand(const char *arg) {
   for (int i = 0; i < COMMAND_COUNT; i++) {
     if (strcmp(arg, commands[i].name)==0) {
@@ -50,10 +50,32 @@ bool isValidCommand(const char *arg) {
   }
   return false;  
 }
-
+*/
 const char *processCommand(const char *arg) {
+  static char* output[MAX_OUTPUT_LEN];
+  const char *error = " : command not found";
   
+  if  (strncmp(arg, "echo ", 5)==0) {
+    return arg + 5;
+  }
+  else if (strncmp(arg, "type ", 5)==0) {
+    const char *secondCommand = arg + 5;
+    
+      for (int i = 0; i < COMMAND_COUNT; i++) {
+        if (strcmp(secondCommand, commands[i].name)==0) {
+          int n = snprintf(output, MAX_OUTPUT_LEN, "%s is a shell of %s", commands[i].name, commands[i].type);
+	  return output;
+	  }  
+        }
+     strcat(arg+5,error);
+     return arg+5;
+     }
+  else {
+    printf("%s: %s\n", arg, error);	  
+  }
+  return NULL;
 }
+
 void printPrompt(void) {
   printf("$ ");
 }
