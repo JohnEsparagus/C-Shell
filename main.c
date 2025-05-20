@@ -53,12 +53,12 @@ bool isValidCommand(const char *arg) {
 */
 const char *processCommand(const char *arg) {
   static char* output[MAX_OUTPUT_LEN];
-  const char *error = " : command not found";
-  
-  if  (strncmp(arg, "echo ", 5)==0) {
+  const char *error = "command not found";
+  size_t argLen = strlen(arg);
+  if  (strncmp(arg, "echo ", 5)==0 && argLen >= 5) {
     return arg + 5;
   }
-  else if (strncmp(arg, "type ", 5)==0) {
+  else if (strncmp(arg, "type ", 5)==0 && argLen >= 5) {
     const char *secondCommand = arg + 5;
     
       for (int i = 0; i < COMMAND_COUNT; i++) {
@@ -67,9 +67,11 @@ const char *processCommand(const char *arg) {
 	  return output;
 	  }  
         }
-     strcat(arg+5,error);
-     return arg+5;
+     if (argLen + strlen(error) < MAX_OUTPUT_LEN){
+       snprintf(output, MAX_OUTPUT_LEN,"%s: %s", secondCommand, error);
+       return output;
      }
+  }
   else {
     printf("%s: %s\n", arg, error);	  
   }
