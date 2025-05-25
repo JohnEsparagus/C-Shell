@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #define COMMAND_COUNT 3
 #define MAX_INPUT_LEN 100
 #define MAX_OUTPUT_LEN 256
