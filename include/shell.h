@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <ctype.h>
 #define COMMAND_COUNT 3
 #define MAX_INPUT_LEN 100
 #define MAX_OUTPUT_LEN 256
@@ -19,5 +21,7 @@ extern Command commands[];
 const char *processCommand(const char *arg);
 void printPrompt(void);
 void readInput(char *input, size_t size);
-
+const char *executeEcho(const char *arg, int argLen);
+const char *executeType(const char *arg, int argLen, char output[]);
+bool isEmptyOrWhiteSpace(const char *arg);
 #endif 
