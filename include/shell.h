@@ -24,4 +24,5 @@ void readInput(char *input, size_t size);
 const char *executeEcho(const char *arg, int argLen);
 const char *executeType(const char *arg, int argLen, char output[]);
 bool isEmptyOrWhiteSpace(const char *arg);
+bool isInPath(const char *command, char output[]);
 #endif 

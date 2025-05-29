@@ -4,6 +4,16 @@ const char *processCommand(const char *arg) {
   static char output[MAX_OUTPUT_LEN];
   const char *error = "command not found";
   size_t argLen = strlen(arg);
+  
+  char *input_copy = strdup(arg); // Make copy of arg cause strtok changes arg
+  if (!input_copy) return error;
+  
+  char *command = strtok(input_copy, " ");
+  if (!command) {
+    free(input_copy);
+    return NULL;
+  }
+  
   if  (strncmp(arg, "echo ", 5)==0) {
     return executeEcho(arg, argLen);
   }
@@ -42,7 +52,7 @@ const char *executeType(const char *arg, int argLen, char output[]) {
     if (!isEmptyOrWhiteSpace(secondCommand)) {
       return error;
     }
-// check if itts a built in
+	// calcheck if itts a built in
       for (int i = 0; i < COMMAND_COUNT; i++) {
         if (strcmp(secondCommand, commands[i].name)==0) {
           snprintf(output, MAX_OUTPUT_LEN, "%s is a shell of %s", commands[i].name, commands[i].type);
@@ -50,27 +60,34 @@ const char *executeType(const char *arg, int argLen, char output[]) {
           }
         } 
 // check if its in one of PATH directories
+    if (isInPath(secondCommand, output)) {
+      return output;
+    }
+    if (argLen + strlen(error) < MAX_OUTPUT_LEN){
+       snprintf(output, MAX_OUTPUT_LEN,"%s: %s", secondCommand, error);
+       return output;
+    }
+    return NULL;
+}
+
+bool isInPath(const char *command, char output[]) {
      char *path = strdup(getenv("PATH"));
      if (path!=NULL) {
        char *dir = strtok(path,":"); //try to replace wiht your own
        while (dir != NULL) {
          char all_paths[MAX_OUTPUT_LEN];
-	 snprintf(all_paths, sizeof(all_paths), "%s/%s", dir, secondCommand);
-	   if (access(all_paths, X_OK) == 0){
-	     strncpy(output, all_paths, MAX_OUTPUT_LEN - 1);
-	     output[MAX_OUTPUT_LEN - 1] = '\0';
-	     free(path);
-	     return output;
-	   }
-	 dir = strtok(NULL, ":");
+         snprintf(all_paths, sizeof(all_paths), "%s/%s", dir, command);
+           if (access(all_paths, X_OK) == 0){
+             strncpy(output, all_paths, MAX_OUTPUT_LEN - 1);
+             output[MAX_OUTPUT_LEN - 1] = '\0';
+             free(path);
+             return true;
+           }
+         dir = strtok(NULL, ":");
        }
        free(path);
      }
-     if (argLen + strlen(error) < MAX_OUTPUT_LEN){
-       snprintf(output, MAX_OUTPUT_LEN,"%s: %s", secondCommand, error);
-       return output;
-     }
-     return "idk";
+     return false;
 }
 
 bool isEmptyOrWhiteSpace(const char *arg) {
