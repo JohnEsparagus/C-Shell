@@ -7,7 +7,7 @@ const char *processCommand(const char *arg) {
   
   char *input_copy = strdup(arg); // Make copy of arg cause strtok changes arg
   if (!input_copy) return error;
-  
+    
   char *command = strtok(input_copy, " ");
   if (!command) {
     free(input_copy);
@@ -21,6 +21,7 @@ const char *processCommand(const char *arg) {
     return executeType(arg, argLen, output);
   }
   else {
+    isInPathExecute(arg, output);
     printf("%s: %s\n", arg, error);
   }
   return NULL;
@@ -71,7 +72,17 @@ const char *executeType(const char *arg, int argLen, char output[]) {
 }
 
 bool isInPath(const char *command, char output[]) {
-     char *path = strdup(getenv("PATH"));
+     if (!command || !output) {
+       return false;
+     }
+     const char *env_path = getenv("PATH");
+     if (!env_path || strlen(env_path) == 0) {
+       return false;
+     }
+     char *path = strdup(env_path);
+     if (!path) {
+       return false ;
+     }
      if (path!=NULL) {
        char *dir = strtok(path,":"); //try to replace wiht your own
        while (dir != NULL) {
@@ -89,6 +100,45 @@ bool isInPath(const char *command, char output[]) {
      }
      return false;
 }
+int isInPathExecute(const char *command, char output[]) {
+  char *input_copy = strdup(command); // Make copy of arg cause strtok changes arg
+  if (!input_copy) return perror;
+
+  char *first_word = strtok(command, " ");
+  if (!first_word) {
+    free(input_copy);
+    return NULL;
+  }
+
+  if (isInPath(first_word, output)) {
+    // create an array of the arguments
+    char* arguments[ARG_MAX];
+    char *token = strtok(command, " ");
+    int i = 0;
+    while (token!=NULL || i < ARG_MAX) { 
+      arguments[i] = token;
+      printf("%s", token);
+      i++;
+      token = strtok(NULL, " ");
+    }
+    arguments[i+1] = NULL;
+
+    // Now arguemnts is populated with args, and output  with the program 
+    int childpid; 
+    if ((childpid = fork()) == -1) {
+      perror("can't fork");
+      exit(1);
+    }
+    else if (childpid == 0) {
+      execv(output, arguments);
+      exit(0);
+    }
+    else {
+      printf("finish");
+      exit(0);
+    }
+  }
+}
 
 bool isEmptyOrWhiteSpace(const char *arg) {
   if (arg==NULL) {
@@ -96,7 +146,7 @@ bool isEmptyOrWhiteSpace(const char *arg) {
   }
   while(*arg!='\0'){
     if (!isspace((unsigned char)*arg)) {
-      return true; 
+      return true;
     }
     arg++;
   }

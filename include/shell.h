@@ -9,7 +9,7 @@
 #define COMMAND_COUNT 3
 #define MAX_INPUT_LEN 100
 #define MAX_OUTPUT_LEN 256
-
+#define ARG_MAX 1000
 typedef struct {
     const char *name;
     const char *description;
@@ -25,4 +25,5 @@ const char *executeEcho(const char *arg, int argLen);
 const char *executeType(const char *arg, int argLen, char output[]);
 bool isEmptyOrWhiteSpace(const char *arg);
 bool isInPath(const char *command, char output[]);
+int isInPathExecute(const char *command, char output[]);
 #endif 
